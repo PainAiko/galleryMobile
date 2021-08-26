@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React,{useEffect, useState} from 'react';
+import React,{useEffect, useRef, useState} from 'react';
 import { StyleSheet, Text, View, Dimensions,SafeAreaView,SafeAreaViewBase,Easing,TouchableOpacity, FlatList,Image } from 'react-native';
 import {API_KEY,API_URL} from './src/components/constant';
 
@@ -21,6 +21,7 @@ const fetchImagesFromPexels = async () => {
 
 export default function App() {
   const [images, setImages] = useState(null)
+  const [index, setIndex] = useState(0)
   useEffect(() => {
     const fetchImages = async () => {
         const images = await fetchImagesFromPexels()
@@ -28,7 +29,11 @@ export default function App() {
     }
     fetchImages();
   },[])
-
+ const topRef = useRef();
+ const thumbRef = useRef();
+ const setActiveIndex = (index) => {
+    setIndex(index);
+ }
  if (!images) {
       return(  <View style={styles.container}>
         <Text>Loading...</Text>
@@ -37,11 +42,15 @@ export default function App() {
   return (              
     <View style={styles.container}>
         <FlatList
+            ref={topRef}
             data={images}
             horizontal={true}
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             keyExtractor={item => item.id.toString()}
+            onMomentumScrollEnd={(event) =>{
+                setActiveIndex(Math.floor(event.nativeEvent.contentOffset.x/ width))
+            }}
             renderItem={({item})=>{
               return <View style={{width,height}}>
                  <Image
@@ -52,6 +61,7 @@ export default function App() {
             }}
         />
          <FlatList
+            ref={thumbRef}
             data={images}
             horizontal={true}
             showsHorizontalScrollIndicator={false}
