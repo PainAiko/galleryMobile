@@ -21,7 +21,7 @@ const fetchImagesFromPexels = async () => {
 
 export default function App() {
   const [images, setImages] = useState(null)
-  const [index, setIndex] = useState(0)
+  const [activeIndex, setActiveIndex] = useState(0)
   useEffect(() => {
     const fetchImages = async () => {
         const images = await fetchImagesFromPexels()
@@ -29,10 +29,32 @@ export default function App() {
     }
     fetchImages();
   },[])
+console.log(width);
+ 
  const topRef = useRef();
  const thumbRef = useRef();
- const setActiveIndex = (index) => {
-    setIndex(index);
+ const scrollToActiveIndex = (index) => {
+   // console.log(index);
+   // console.log(topRef.current);
+    setActiveIndex(index);
+    topRef?.current?.scrollToOffset({
+      offset: index * width,
+      animated: true
+    })
+
+    if(index *(IMAGE_SIZE+ SPACING) - IMAGE_SIZE/2 > width/2 ){
+      thumbRef.current.scrollToOffset({
+        offset: index *(IMAGE_SIZE+ SPACING) - width/2 +IMAGE_SIZE/2,
+        animated:true
+      })
+    }
+    else {
+      thumbRef.current.scrollToOffset({
+        offset: 0,
+        animated:true
+      })
+    }
+
  }
  if (!images) {
       return(  <View style={styles.container}>
@@ -48,10 +70,12 @@ export default function App() {
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             keyExtractor={item => item.id.toString()}
-            onMomentumScrollEnd={(event) =>{
-                setActiveIndex(Math.floor(event.nativeEvent.contentOffset.x/ width))
+            onMomentumScrollEnd={(event) =>{//onMomentumScrollEnd appele lorsque le defilement est terminer
+                console.log(event.nativeEvent.contentOffset.x);
+                scrollToActiveIndex(Math.floor(event.nativeEvent.contentOffset.x/ width))
             }}
             renderItem={({item})=>{
+              //console.log(StyleSheet.absoluteFillObject);
               return <View style={{width,height}}>
                  <Image
                   source={{uri: item.src.portrait}}
@@ -68,16 +92,24 @@ export default function App() {
             style={{position: 'absolute',bottom: IMAGE_SIZE}}
             keyExtractor={item => item.id.toString()}
             contentContainerStyle={{paddingHorizontal: SPACING}}
-            renderItem={({item})=>{
-              return <Image
-                        style={{
-                          width:IMAGE_SIZE,
-                          height: IMAGE_SIZE, 
-                          borderRadius: 12,
-                          marginRight: SPACING
-                        }}
-                       source={{uri: item.src.portrait}}
-              />
+            renderItem={({item,index})=>{
+              return (
+                <TouchableOpacity 
+                     onPress={() => scrollToActiveIndex(index)}
+                >
+                    <Image
+                          style={{
+                            width:IMAGE_SIZE,
+                            height: IMAGE_SIZE, 
+                            borderRadius: 12,
+                            marginRight: SPACING,
+                            borderWidth: 1,
+                            borderColor: activeIndex === index ? '#fff' : 'transparent'
+                          }}
+                        source={{uri: item.src.portrait}}
+                    />
+                </TouchableOpacity>
+              )
             }}
         />
         <StatusBar backgroundColor='green'/>
