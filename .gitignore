@@ -1,13 +1,13 @@
-node_modules/
-.expo/
-npm-debug.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-*.orig.*
-web-build/
+galleryMobile/node_modules/
+galleryMobile/.expo/
+galleryMobile/npm-debug.*
+galleryMobile/*.jks
+galleryMobile/*.p8
+galleryMobile/*.p12
+galleryMobile/*.key
+galleryMobile/*.mobileprovision
+galleryMobile/*.orig.*
+galleryMobile/web-build/
 
 # macOS
-.DS_Store
+galleryMobile/.DS_Store
